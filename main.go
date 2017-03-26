@@ -12,6 +12,19 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
+	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
+		return []byte(mConfig.Signing.SecretKey), nil
+	},
+	SigningMethod: jwt.SigningMethodHS256,
+})
+
+var mConfig *config.Config = nil
+
+func init() {
+	mConfig = config.DevConfig
+}
+
 func main() {
 	r := mux.NewRouter()
 
@@ -20,13 +33,6 @@ func main() {
 	r.Handle("/user/{id}", controllers.DeleteUser).Methods("DELETE")
 	r.Handle("/login", controllers.Login).Methods("POST")
 
-	mConfig := config.DevConfig
 	http.ListenAndServe(mConfig.Env.Port, handlers.LoggingHandler(os.Stdout, r))
 }
 
-var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
-	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-		return []byte("MasterOfNone"), nil
-	},
-	SigningMethod: jwt.SigningMethodHS256,
-})

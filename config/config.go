@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"io/ioutil"
 )
 
@@ -28,7 +29,8 @@ type Authorization struct {
 var DevConfig *Config = nil
 
 func init() {
-	file, _ := ioutil.ReadFile("auth/config/config.json")
+	absPath, _ := filepath.Abs("../go-auth/config/config.json")
+	file, _ := ioutil.ReadFile(absPath)
 	err := json.Unmarshal(file, &DevConfig)
 	if err != nil {
 		fmt.Println("error:", err)
